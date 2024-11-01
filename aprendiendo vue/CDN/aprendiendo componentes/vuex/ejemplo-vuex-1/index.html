@@ -25,9 +25,9 @@
             `,
             computed:{
                 ...Vuex.mapState(
-                [
-                    'numero' //llamamos al estado que necesitamos mapear
-                ]
+                     [
+                        'numero' //llamamos al estado que necesitamos mapear
+                     ]
             )//una forma mas ordenada de computar nuestros states
             }
         });
@@ -36,27 +36,71 @@
             template: //html
             `
             <div>
-                <button @click="$store.commit('aumentar')">+</button><!--Siempre utilizamos el commit para poder realizar mutaciones-->
-                <h1>numero {{ $store.state.numero }}</h1><!--Siempre utilizar el signo $ para llamar a la store de vuex-->
+                <button @click="aumentar">+</button><!--Siempre utilizamos el commit para poder realizar mutaciones-->
+                <button @click="disminuir(5)">-</button>
+                <button @click="obtenerCursos">Obtener Cursos</button>
+                <h1>numero {{ numero }}</h1><!--Siempre utilizar el signo $ para llamar a la store de vuex-->
+                <ul v-for="item of cursos">
+                    <li>{{item.nombre}}</li>
+                </ul>
             </div>
-            `
-        });
+            `,
+
+            computed:{
+                ...Vuex.mapState(
+                     [
+                        'numero', //llamamos al estado que necesitamos mapear
+                        'cursos'
+                    ]
+            )//una forma mas ordenada de computar nuestros states
+            
+        },
+            methods: {
+                ...Vuex.mapMutations(
+                    [
+                        'aumentar', //llamamos el nombre de la mutacion que queremos mapear en methos de store
+                        'disminuir'
+                    ]
+            ),//una forma mas ordenada de traer como un methodo a una mutacion
+            
+            ...Vuex.mapActions(['obtenerCursos'])
+        
+            }
+                });
 
         const store = new Vuex.Store({
             state: {
-                numero: 10
+                numero: 10,
+                cursos: []//nuestro estado como un array vacio para ser llenado con la informacion que traigamos desde una api mediante acciones
+                
             }, //creamos los estados, los cuales son los datos que podemos utilizar tanto en padre como en hijos in presentar problematicas
 
             mutations: {
                 aumentar(state) {
                     state.numero++;
-                }
+                },
                 /* otra forma de expresarlo seria la siguiente sino estuvieramos ya pasando el state como parametro
 
                 aumentar(){
                     this.state.numero ++
                 }*/
-            }//las mutaciones son como los metodos de nuestros estados, son las encargadas de poder alterarlos
+
+                disminuir(state, n){
+                    state.numero -= n //aqui le agregamos el parametro n, para que segun el valor que le demos en el click, haga la reduccion
+                },
+                llenarCursos(state, cursosAccion){//aqui le aparte del estado que traemos, tambien asignamos otra propiedad la cuel va a ser la encargada de llenar guardar la informacion en la mutacion
+
+                    state.cursos = cursosAccion //aqui especificamos que el estado cursos va a tener elvalor que tenga cursosAccion
+                }//creamos una mutacion para seguir con nuestro ciclo de llamado de api con accione
+            },//las mutaciones son como los metodos de nuestros estados, son las encargadas de poder alterarlos
+
+            actions:{
+                obtenerCursos: async function ({commit}) {
+                    const data = await fetch('cursos.json');//llamamos nuestra api que esta en formato json con fetch
+                    const cursos = await data.json();//Lo guardamos en una constante como formato json
+                    commit('llenarCursos', cursos)
+                }
+            }
 
         });//creamos la instancia de store para trabajar con los datos globales que tendra nuestra app
 
