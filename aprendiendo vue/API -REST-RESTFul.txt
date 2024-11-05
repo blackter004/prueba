@@ -1,0 +1,5 @@
+API: formade que nosotros nos comuniquemos con una informacion externa para nuestra pagina web
+
+REST: una tecnica en la arquitectura del software para crear APIs
+
+RESTFul: REST es el conceptto, pero RESTFul es la implementacion
